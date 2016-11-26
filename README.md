@@ -28,7 +28,7 @@ Example:
 ```
 java -jar smellyrepos.jar 
 	/Users/mauricioaniche/workspace/gnarus/ 
-	"(.)*dao" 
+	"(.*)dao" 
 	result.txt
 ``` 
 
