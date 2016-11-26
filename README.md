@@ -21,7 +21,7 @@ java -jar smellyrepos.jar <project path> <regex> <output file>
 
 The regex should explain how the nomenclature of your repositories work. It should also
 explicit delimit the repository name, so that we can extract it. Examples are: 
-(.)*dao, all(.)*s, etc.
+(.*)dao, all(.*)s, etc.
 
 Example:
 
