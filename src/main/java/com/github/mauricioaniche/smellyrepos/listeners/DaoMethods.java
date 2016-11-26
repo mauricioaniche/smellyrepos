@@ -23,7 +23,7 @@ public class DaoMethods extends JavaBaseListener {
 	private Set<String> rightOnes;
 	private Set<String> problematicOnes;
 	private String lastModifier;
-	private List<String> primitivesList;
+	private static List<String> primitivesList;
 	private Set<String> enumerators;
 	private Map<String, Set<String>> subtypes;
 	private boolean inner;
@@ -31,15 +31,7 @@ public class DaoMethods extends JavaBaseListener {
 	private String genericType = null;
 	private Pattern pattern;
 	
-	public DaoMethods(Set<String> enumerators, Map<String, Set<String>> subtypes, String regex) {
-		this.enumerators = enumerators;
-		this.subtypes = subtypes;
-		this.pattern = Pattern.compile(regex);
-		
-		rightOnes = new HashSet<String>();
-		problematicOnes = new HashSet<String>();
-		classes = new Stack<String>();
-		
+	static {
 		primitivesList = new ArrayList<String>();
 		primitivesList.add("int");
 		primitivesList.add("boolean");
@@ -61,6 +53,16 @@ public class DaoMethods extends JavaBaseListener {
 		primitivesList.add("BigDecimal");
 		primitivesList.add("Calendar");
 		primitivesList.add("Date");
+	}
+	
+	public DaoMethods(Set<String> enumerators, Map<String, Set<String>> subtypes, String regex) {
+		this.enumerators = enumerators;
+		this.subtypes = subtypes;
+		this.pattern = Pattern.compile(regex);
+		
+		rightOnes = new HashSet<String>();
+		problematicOnes = new HashSet<String>();
+		classes = new Stack<String>();
 	}
 
 	public Set<String> getRightOnes() {
