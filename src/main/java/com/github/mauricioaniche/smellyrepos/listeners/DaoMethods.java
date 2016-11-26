@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import com.github.mauricioaniche.smellyrepos.antlr.JavaBaseListener;
 import com.github.mauricioaniche.smellyrepos.antlr.JavaParser;
 import com.github.mauricioaniche.smellyrepos.antlr.JavaParser.FormalParameterContext;
+import com.github.mauricioaniche.smellyrepos.antlr.JavaParser.GenericInterfaceMethodDeclarationContext;
 import com.github.mauricioaniche.smellyrepos.antlr.JavaParser.MethodDeclarationContext;
 
 public class DaoMethods extends JavaBaseListener {
@@ -28,10 +29,12 @@ public class DaoMethods extends JavaBaseListener {
 	private boolean inner;
 	
 	private String genericType = null;
+	private Pattern pattern;
 	
-	public DaoMethods(Set<String> enumerators, Map<String, Set<String>> subtypes) {
+	public DaoMethods(Set<String> enumerators, Map<String, Set<String>> subtypes, String regex) {
 		this.enumerators = enumerators;
 		this.subtypes = subtypes;
+		this.pattern = Pattern.compile(regex);
 		
 		rightOnes = new HashSet<String>();
 		problematicOnes = new HashSet<String>();
@@ -81,6 +84,11 @@ public class DaoMethods extends JavaBaseListener {
 		genericType = null;
 	}
 	
+	public void enterGenericInterfaceMethodDeclaration(GenericInterfaceMethodDeclarationContext ctx) {
+		System.out.println("OI " + ctx.getText());
+		super.enterGenericInterfaceMethodDeclaration(ctx);
+	}
+	
 	@Override public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
 		if(notOnMainClass()) return;
 		if(notPublic()) return;
@@ -88,11 +96,11 @@ public class DaoMethods extends JavaBaseListener {
 		String typeAsInTheCode;
 		if(ctx.type()==null) typeAsInTheCode = "void";
 		else typeAsInTheCode = ctx.type().getText();
-		
 		String returnType = removeGenerics(typeAsInTheCode);
-		String methodName = FullMethodName.fullMethodName(ctx.Identifier().getText(), ctx.formalParameters().formalParameterList());
 		
-		if(typeMatches(clazz(), returnType) || parameterIsFromType(ctx) ||
+		String methodName = FullMethodName.fullMethodName(ctx.Identifier().getText(), ctx.formalParameters().formalParameterList(), typeAsInTheCode);
+		
+		if(typeMatches(returnType) || parameterIsFromType(ctx) ||
 				allParametersArePrimitives(ctx, returnType) ||
 				isPrimitive(returnType) || isEnum(returnType) || 
 				isSubtypeOrInterface(returnType) || isGenericWithManyTypes(returnType) ||
@@ -101,6 +109,8 @@ public class DaoMethods extends JavaBaseListener {
 		} else {
 			problematicOnes.add(methodName);
 		}
+		
+		super.enterMethodDeclaration(ctx);
 	}
 
 	private boolean genericTypeIsTheSameOfType() {
@@ -111,7 +121,7 @@ public class DaoMethods extends JavaBaseListener {
 		m.matches();
 		
 		String cleanedGenericType = m.group(3);
-		return typeMatches(clazz(), cleanedGenericType);
+		return typeMatches(cleanedGenericType);
 	}
 
 	private boolean notOnMainClass() {
@@ -135,7 +145,13 @@ public class DaoMethods extends JavaBaseListener {
 	}
 
 	private boolean isDTO(String returnType) {
-		return returnType.contains(clazzWithoutDao());
+		return returnType.toLowerCase().contains(clazzWithoutDao().toLowerCase());
+	}
+
+	private String clazzWithoutDao() {
+		Matcher matcher = pattern.matcher(clazz().toLowerCase());
+		matcher.matches();
+		return matcher.group(1);
 	}
 
 	private boolean isGenericWithManyTypes(String returnType) {
@@ -150,10 +166,6 @@ public class DaoMethods extends JavaBaseListener {
 		Set<String> interfacesImplemented = subtypes.get(returnType);
 		if(interfacesImplemented == null) return false;
 		return interfacesImplemented.contains(clazzWithoutDao());
-	}
-
-	private String clazzWithoutDao() {
-		return clazz().substring(0, clazz().length()-3);
 	}
 
 	private boolean isEnum(String returnType) {
@@ -185,8 +197,8 @@ public class DaoMethods extends JavaBaseListener {
 	}
 
 
-	private boolean typeMatches(String daoClazz, String type) {
-		return daoClazz.startsWith(type);
+	private boolean typeMatches(String type) {
+		return type.toLowerCase().equals(clazzWithoutDao());
 	}
 	
 	private boolean parameterIsFromType(MethodDeclarationContext ctx) {
@@ -194,7 +206,7 @@ public class DaoMethods extends JavaBaseListener {
 
 		for(FormalParameterContext param : ctx.formalParameters().formalParameterList().formalParameter()) {
 			String parameterType = removeGenerics(param.type().getText());
-			if(typeMatches(clazz(), parameterType)) return true;
+			if(typeMatches(parameterType)) return true;
 		}
 		return false;
 	}

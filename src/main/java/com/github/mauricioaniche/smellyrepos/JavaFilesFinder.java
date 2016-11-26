@@ -3,13 +3,16 @@ package com.github.mauricioaniche.smellyrepos;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class JavaFilesFinder {
 
 	private final String path;
+	private Pattern pattern;
 
-	public JavaFilesFinder(String path) {
+	public JavaFilesFinder(String path, String regex) {
 		this.path = path;
+		this.pattern = Pattern.compile(regex);
 	}
 
 	private void getAllDaoFilesIn(File aStartingDir, ArrayList<File> result) {
@@ -46,7 +49,7 @@ public class JavaFilesFinder {
 	}
 
 	private boolean isDao(File file) {
-		return file.getName().toUpperCase().endsWith("DAO.JAVA");
+		return pattern.matcher(file.getName().toLowerCase()).matches();
 	}
 
 	public List<File> getAllDaoFiles() {

@@ -1,14 +1,13 @@
 package com.github.mauricioaniche.smellyrepos.listeners;
 
 import com.github.mauricioaniche.smellyrepos.antlr.JavaParser.FormalParameterListContext;
-import com.github.mauricioaniche.smellyrepos.antlr.JavaParser.MethodDeclarationContext;
 
 
 public class FullMethodName {
 
 	
-	public static String fullMethodName(String name, FormalParameterListContext parameters) {
-		return name + "/" + (parameters == null ? "0" : (parameters.formalParameter().size() + typesIn(parameters)));
+	public static String fullMethodName(String name, FormalParameterListContext parameters, String returnType) {
+		return name + "/" + (parameters == null ? "0" : (parameters.formalParameter().size() + typesIn(parameters))) + ":" + returnType;
 	}
 
 	private static String typesIn(FormalParameterListContext parameters) {
@@ -21,10 +20,6 @@ public class FullMethodName {
 		}
 		
 		return types.substring(0, types.length() - 1) + "]";
-	}
-
-	public static String fullMethodName(MethodDeclarationContext ctx) {
-		return FullMethodName.fullMethodName(ctx.Identifier().getText(), ctx.formalParameters().formalParameterList());
 	}
 
 }

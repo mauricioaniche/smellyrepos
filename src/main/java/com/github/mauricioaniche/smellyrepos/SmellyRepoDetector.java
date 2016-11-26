@@ -22,16 +22,19 @@ public class SmellyRepoDetector {
 	private JavaFilesFinder files;
 	private Map<String, SmellyRepo> repos;
 	private PrintStream ps;
+	private String regex;
 	
-	public SmellyRepoDetector(PrintStream ps) {
+	public SmellyRepoDetector(PrintStream ps, String regex) {
 		this.ps = ps;
+		this.regex = regex;
+		
 		enumerators = new HashSet<String>();
 		subtypes = new HashMap<String, Set<String>>();
 		this.repos = new HashMap<String, SmellyRepo>();
 	}
 	
 	public void execute(String projectPath) {
-		files = new JavaFilesFinder(projectPath);
+		files = new JavaFilesFinder(projectPath, regex + "\\.java");
 		
 		extractTypeInfo();
 		detectSmells();
@@ -49,9 +52,9 @@ public class SmellyRepoDetector {
 		ps.println("-------");
 		ps.println("Summary");
 		ps.println("-------");
-		ps.println("Total repos        : " + repos.size());
-		ps.println("Total methods      : " + totalMethods);
-		ps.println("Problematic methods: " + problematicMethods + "(" + pct + ")");
+		ps.println(String.format("Total repos         : %d", repos.size()));
+		ps.println(String.format("Total methods       : %d", totalMethods));
+		ps.println(String.format("Problematic methods : %d (%.2f%%)",problematicMethods, pct));
 		
 	}
 
@@ -70,7 +73,7 @@ public class SmellyRepoDetector {
 	private void detectSmells() {
 		for(File f : files.getAllDaoFiles()) {
 			try {
-				DaoMethods allMethods = new DaoMethods(enumerators, subtypes);
+				DaoMethods allMethods = new DaoMethods(enumerators, subtypes, regex);
 				new ParserRunner(allMethods).run(new FileInputStream(f));
 				
 				repos.put(f.getCanonicalPath(), new SmellyRepo(f.getCanonicalPath(), allMethods.getProblematicOnes(), allMethods.getRightOnes()));
