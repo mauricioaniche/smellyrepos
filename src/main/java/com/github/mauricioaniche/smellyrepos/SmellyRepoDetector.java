@@ -44,8 +44,8 @@ public class SmellyRepoDetector {
 	}
 
 	private void printSummary() {
-		int problematicMethods = repos.values().stream().mapToInt(x -> x.getNonProblematic().size()).sum();
-		int okMethods = repos.values().stream().mapToInt(x -> x.getProblematic().size()).sum();
+		int problematicMethods = repos.values().stream().mapToInt(x -> x.getProblematic().size()).sum();
+		int okMethods = repos.values().stream().mapToInt(x -> x.getNonProblematic().size()).sum();
 		int totalMethods = problematicMethods + okMethods;
 		double pct = (double) problematicMethods / (double) totalMethods;
 		
