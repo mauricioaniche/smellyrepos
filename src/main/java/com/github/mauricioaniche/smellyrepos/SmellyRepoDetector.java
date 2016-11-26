@@ -54,7 +54,7 @@ public class SmellyRepoDetector {
 		ps.println("-------");
 		ps.println(String.format("Total repos         : %d", repos.size()));
 		ps.println(String.format("Total methods       : %d", totalMethods));
-		ps.println(String.format("Problematic methods : %d (%.2f%%)",problematicMethods, pct));
+		ps.println(String.format("Problematic methods : %d (%.2f%%)",problematicMethods*100, pct));
 		
 	}
 
