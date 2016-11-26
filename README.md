@@ -11,6 +11,8 @@ is primitive, is an enum or is a subtype of the type.
 
 ## Executing the tool
 
+You can download the jar at our releases page (https://github.com/mauricioaniche/smellyrepos/releases).
+
 The tool receives 3 parameters:
 
 ```
