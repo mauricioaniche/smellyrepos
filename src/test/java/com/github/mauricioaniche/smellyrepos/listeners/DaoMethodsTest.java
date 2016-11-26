@@ -87,6 +87,19 @@ public class DaoMethodsTest {
 	}
 	
 	@Test
+	public void shouldMatchDaosWithRelatedNamesToEntity() {
+		String dao = 
+				"class AdminCourseDAO {"
+						+ "public List<Course> allNotEvent() {}"
+						+ "}";
+		
+		new ParserRunner(methods).run(new ByteArrayInputStream(dao.getBytes()));
+		
+		Assert.assertEquals(1,methods.getRightOnes().size());
+		Assert.assertTrue(methods.getRightOnes().contains("allNotEvent/0:List<Course>"));
+	}
+	
+	@Test
 	public void shouldMatchIfAllParametersArePrimitive() {
 		String dao = 
 				"class InvoiceDAO {"

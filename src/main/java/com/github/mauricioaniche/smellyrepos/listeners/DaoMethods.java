@@ -200,7 +200,12 @@ public class DaoMethods extends JavaBaseListener {
 
 
 	private boolean typeMatches(String type) {
-		return type.toLowerCase().equals(clazzWithoutDao());
+		String clazzName = clazzWithoutDao().toLowerCase();
+		String typeName = type.toLowerCase();
+		
+		return typeName.equals(clazzName) 
+				|| clazzName.startsWith(typeName)
+				|| clazzName.endsWith(typeName);
 	}
 	
 	private boolean parameterIsFromType(MethodDeclarationContext ctx) {
