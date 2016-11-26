@@ -103,7 +103,7 @@ public class DaoMethods extends JavaBaseListener {
 		String methodName = FullMethodName.fullMethodName(ctx.Identifier().getText(), ctx.formalParameters().formalParameterList(), typeAsInTheCode);
 		
 		if(typeMatches(returnType) || parameterIsFromType(ctx) ||
-				allParametersArePrimitives(ctx, returnType) ||
+				(returnType.equals("void") && allParametersArePrimitives(ctx, returnType)) ||
 				isPrimitive(returnType) || isEnum(returnType) || 
 				isSubtypeOrInterface(returnType) || isGenericWithManyTypes(returnType) ||
 				isDTO(returnType) || genericTypeIsTheSameOfType()) {
